@@ -1,14 +1,13 @@
 package fr.utt;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         Scanner scanner = new Scanner(System.in);
         CramerShoup cramerShoup = new CramerShoup();
-        Hash hash = new Hash();
         int reponse=0;
 
         System.out.println("Bienvenue dans notre Projet GS15 Léo Schneider/Marc Lanois\n");
@@ -37,16 +36,15 @@ public class Main {
                     cramerShoup.keygen(nbBits);
                     break;
                 case 4:
-                    System.out.println("Sur combien de bits voulez vous chiffrer ?");
-                    nbBits=scanner.nextInt();
-                    cramerShoup.keygen(nbBits);
-                    System.out.println("Entrez la valeur du nombre que vous voulez chiffrer\n");
-                    cramerShoup.encrypt(nbBits,scanner.nextBigInteger(),cramerShoup.getPublicKey());
+                    cramerShoup.encrypt();
                     break;
                 case 5:
+                    cramerShoup.decrypt();
                     break;
                 case 6:
-                    //lancer la fonction de hash depuis objet hash
+                    System.out.println("Quel string voulez vous hash ?");
+                    String stringToHash = scanner.nextLine();
+                    System.out.println("Voici le hash de votre string :\n"+Hash.monHash(stringToHash));
                     break;
                 default:break;
             }
