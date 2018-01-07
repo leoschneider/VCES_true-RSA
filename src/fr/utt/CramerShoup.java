@@ -66,42 +66,25 @@ public class CramerShoup {
         BigInteger Y = recuperationFichier.get(4);
         BigInteger W = recuperationFichier.get(5);
 
-        System.out.println("Quel type de fichier voulez vous travailler avec ? : \n" +
-                "1 simple texte par ligne de commande\n" +
-                "2 fichier .txt\n");
-        int reponse = scanner.nextInt();
-        scanner.nextLine();
-        switch (reponse){
-            case 1:
-                //on récupère le texte à chiffrer :
-                System.out.println("Entrez le texte que vous voulez chiffrer\n");
-                byte[] input = new byte[4096];
-                int read = System.in.read(input,0,4096);
-                byte[] nbyte = Arrays.copyOf(input, read);
-                m = new BigInteger(nbyte);
-                System.out.println(m);
-                break;
-            case 2:
-                //on récupère un fichier
-                try{
-                    System.out.println("Veuillez indiquer votre fichier");
-                    String FilePath = scanner.nextLine();
+        //on récupère le fichier
+        try{
+            System.out.println("Veuillez indiquer votre fichier à chiffrer.");
+            String FilePath = scanner.nextLine();
 
-                    //on récupère les bytes
-                    byte[] inputBytes = Files.readAllBytes(Paths.get(FilePath));
-                    int chunkSize = p.bitLength()-1;
+            //on récupère les bytes
+            byte[] inputBytes = Files.readAllBytes(Paths.get(FilePath));
+            int chunkSize = p.bitLength()-1;
 
-                    //on assigne les blocs en fonction de la taille de clé
-                    for(int i=0;i<inputBytes.length;i+=chunkSize){                                                            //original découpement blocs
-                        byte[] bytesBlocs = Arrays.copyOfRange(inputBytes, i, Math.min(inputBytes.length - 1, i+chunkSize));
-                        chunks.add(new BigInteger(bytesBlocs));
-                    }
-                    }catch(Exception e){
-                    System.out.println(" |_!_| Erreur : "+e.getMessage());
-                    return;
-                }break;
-            default: break;
+            //on assigne les blocs en fonction de la taille de clé
+            for(int i=0;i<inputBytes.length;i+=chunkSize){                                                            //original découpement blocs
+                byte[] bytesBlocs = Arrays.copyOfRange(inputBytes, i, Math.min(inputBytes.length - 1, i+chunkSize));
+                chunks.add(new BigInteger(bytesBlocs));
+            }
+        }catch(Exception e){
+            System.out.println(" |_!_| Erreur : "+e.getMessage());
+            return;
         }
+
 
         //les morceaux chiffrés
         ArrayList<BigInteger> cChunks = new ArrayList<>();
@@ -209,6 +192,8 @@ public class CramerShoup {
         for(BigInteger bigInteger : mChunks){
             System.out.println(new String(bigInteger.toByteArray()));
         }
+        //ligne vide
+        System.out.println("");
 
         //ecrire dans le fichier o.txt le message en clair déchiffré
         try {
@@ -219,7 +204,7 @@ public class CramerShoup {
                 byte[] readInter = bg.toByteArray();
                 Files.write(outputFile,readInter, StandardOpenOption.APPEND);
             }
-            System.out.println("->le message complet a été écrit dans le fichier o.txt");
+            System.out.println("->le message complet a été écrit dans le fichier o.txt\n");
         } catch (IOException e) {
             System.out.println(" |_!_| L'écriture du fichier o.txt n'a pas fonctionné."+e.getMessage()+"\n");
         }
