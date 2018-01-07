@@ -25,10 +25,14 @@ public class Main {
             reponse = scanner.nextInt();
             switch (reponse){
                 case 1:
-                    //call partie Marc
+                    System.out.println("Sur quel taille de bloc voulez-vous chiffrer ? (256, 512 ou 1024 bits)");
+                    int tailleChiffrer=scanner.nextInt();
+                    t.ThreeFish(reponse, tailleChiffrer);
                     break;
                 case 2:
-                    //call partie Marc
+                    System.out.println("Sur quel taille de bloc voulez-vous déchiffrer ? (256, 512 ou 1024 bits)");
+                    int tailleDechiffrer=scanner.nextInt();
+                    t.ThreeFish(reponse, tailleDechiffrer);
                     break;
                 case 3:
                     System.out.println("Sur combien de bits voulez vous générer les clés ?");
