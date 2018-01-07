@@ -8,6 +8,7 @@ public class Main {
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         Scanner scanner = new Scanner(System.in);
         CramerShoup cramerShoup = new CramerShoup();
+        ThreeFish t = new ThreeFish();
         int reponse=0;
 
         System.out.println("Bienvenue dans notre Projet GS15 Léo Schneider/Marc Lanois\n");
