@@ -48,6 +48,7 @@ public class Main {
                     break;
                 case 6:
                     System.out.println("Quel string voulez vous hash ?");
+                    scanner.nextLine();
                     String stringToHash = scanner.nextLine();
                     System.out.println("Voici le hash de votre string :\n"+Hash.monHash(stringToHash));
                     break;
