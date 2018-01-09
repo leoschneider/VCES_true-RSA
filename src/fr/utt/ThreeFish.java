@@ -29,6 +29,8 @@ public class ThreeFish {
 
     private static BigInteger puissance = new BigInteger("2");
 
+    private static final int numVI = 1;
+
     private int[] p;
 
     private int[] pi;
@@ -40,7 +42,7 @@ public class ThreeFish {
 
     public Scanner scanner = new Scanner(System.in);
 
-    public void ThreeFish(int mode, int choixBlocs) throws IOException, NoSuchAlgorithmException {
+    public void ThreeFish(int type, int choixBlocs, int mode) throws IOException, NoSuchAlgorithmException {
         String fichierMessage;
         String fichierCle;
 
@@ -64,7 +66,7 @@ public class ThreeFish {
         if (tailleBlocs == (message.length*8)){
             BigInteger[] messageConcatene = concatenation(message);
             BigInteger[] cleConcatenee = concatenation(cle);
-            switch (mode){
+            switch (type){
                 case 1:
                     //Chiffrement du message et écriture du fichier
                     try {
@@ -89,52 +91,145 @@ public class ThreeFish {
         }
         //Cas où la taille de bloc choisie est différente de celle du message
         else{
-            BigInteger[][] ensembleMessage = new BigInteger[message.length*8/tailleBlocs][tailleBlocs/8];
-            BigInteger[][] ensembleCle = new BigInteger[cle.length*8/tailleBlocs][tailleBlocs/8];
-
             //Division des données taille de bloc choisie
             byte[][] messageDivise = diviserDonnee(message);
             byte[][] cleDivisee = diviserDonnee(cle);
-            switch (mode){
+            switch (type){
                 case 1:
-                    //Chiffrement de chaque bloc
-                    BigInteger[] messageChiffre = new BigInteger[message.length/8];
-                    for (int i=0; i<message.length*8/tailleBlocs; ++i){
-                        ensembleMessage[i] = concatenation(messageDivise[i]);
-                        ensembleCle[i] = concatenation(cleDivisee[i]);
-                        ensembleMessage[i] = chiffrement(ensembleMessage[i], ensembleCle[i]);
-                        //Ajout des données de chaque bloc chiffré à une variable
-                        System.arraycopy(ensembleMessage[i], 0 ,messageChiffre, i*ensembleMessage[i].length, ensembleMessage[i].length);
-                    }
-                    //Ecriture du fichier de chiffrement
-                    try {
-                        ecritureFichier("messageChiffre.txt", messageChiffre);
-                        System.out.println(" -> Le fichier contenant le message chiffré est messageChiffre.txt\n");
-                    } catch (IOException e) {
-                        System.out.println(" |_!_| L'écriture du fichier messageChiffre.txt n'a pas fonctionné.\n");
+                    switch (mode){
+                        case 1:
+                            //Chiffrement en mode ECB
+                            chiffrementModeECB(messageDivise, cleDivisee, message.length, cle.length);
+                            break;
+                        case 2:
+                            //Chiffrement en mode CBC
+                            chiffrementModeCBC(messageDivise, cleDivisee, message.length, cle.length);
+                            break;
+                        default:
+                            break;
                     }
                     break;
                 case 2:
-                    //Déchiffrement de chaque bloc
-                    BigInteger[] messageDechiffre = new BigInteger[message.length/8];
-                    for (int i=0; i<message.length*8/tailleBlocs; ++i){
-                        ensembleMessage[i] = concatenation(messageDivise[i]);
-                        ensembleCle[i] = concatenation(cleDivisee[i]);
-                        ensembleMessage[i] = dechiffrement(ensembleMessage[i], ensembleCle[i]);
-                        //Ajout des données de chaque bloc déchiffré à une variable
-                        System.arraycopy(ensembleMessage[i], 0 ,messageDechiffre, i*ensembleMessage[i].length, ensembleMessage[i].length);
-                    }
-                    //Ecriture du fichier de déchiffrement
-                    try {
-                        ecritureFichier("messageDechiffre.txt", messageDechiffre);
-                        System.out.println(" -> Le fichier contenant le message déchiffré est messageDechiffre.txt\n");
-                    } catch (IOException e) {
-                        System.out.println(" |_!_| L'écriture du fichier messageDechiffre.txt n'a pas fonctionné.\n");
+                    switch (mode){
+                        case 1:
+                            //Déchiffrement en mode ECB
+                            dechiffrementModeECB(messageDivise, cleDivisee, message.length, cle.length);
+                            break;
+                        case 2:
+                            //Déchiffrement en mode CBC
+                            dechiffrementModeCBC(messageDivise, cleDivisee, message.length, cle.length);
+                            break;
+                        default:
+                            break;
                     }
                     break;
                 default:
                     break;
             }
+        }
+    }
+
+    public void chiffrementModeECB(byte[][] messageDivise, byte[][] cleDivisee, int messageLength, int cleLength) throws IOException, NoSuchAlgorithmException {
+        BigInteger[][] ensembleMessage = new BigInteger[messageLength*8/tailleBlocs][tailleBlocs/8];
+        BigInteger[][] ensembleCle = new BigInteger[cleLength*8/tailleBlocs][tailleBlocs/8];
+        BigInteger[] messageChiffre = new BigInteger[messageLength/8];
+        //Chiffrement de chaque bloc
+        for (int i=0; i<messageLength*8/tailleBlocs; ++i){
+            ensembleMessage[i] = concatenation(messageDivise[i]);
+            ensembleCle[i] = concatenation(cleDivisee[i]);
+            ensembleMessage[i] = chiffrement(ensembleMessage[i], ensembleCle[i]);
+            //Ajout des données de chaque bloc chiffré à une variable
+            System.arraycopy(ensembleMessage[i], 0 ,messageChiffre, i*ensembleMessage[i].length, ensembleMessage[i].length);
+        }
+        //Ecriture du fichier de chiffrement
+        try {
+            ecritureFichier("messageChiffre.txt", messageChiffre);
+            System.out.println(" -> Le fichier contenant le message chiffré est messageChiffre.txt\n");
+        } catch (IOException e) {
+            System.out.println(" |_!_| L'écriture du fichier messageChiffre.txt n'a pas fonctionné.\n");
+        }
+    }
+
+    public void chiffrementModeCBC(byte[][] messageDivise, byte[][] cleDivisee, int messageLength, int cleLength) throws IOException, NoSuchAlgorithmException {
+        BigInteger[][] ensembleMessage = new BigInteger[messageLength*8/tailleBlocs][tailleBlocs/8];
+        BigInteger[][] ensembleCle = new BigInteger[cleLength*8/tailleBlocs][tailleBlocs/8];
+        BigInteger[] messageChiffre = new BigInteger[messageLength/8];
+        //Définition du vecteur d'initialisation
+        BigInteger[] vi = concatenation(cleDivisee[numVI]);
+        //Chiffrement de chaque bloc
+        for (int i=0; i<messageLength*8/tailleBlocs; ++i){
+            ensembleMessage[i] = concatenation(messageDivise[i]);
+            //XOR entre le message clair et le vecteur
+            for (int j=0; j<ensembleMessage[i].length; ++j){
+                ensembleMessage[i][j] = ensembleMessage[i][j].xor(vi[j]);
+            }
+            ensembleCle[i] = concatenation(cleDivisee[i]);
+            ensembleMessage[i] = chiffrement(ensembleMessage[i], ensembleCle[i]);
+            //Ajout des données de chaque bloc chiffré à une variable
+            System.arraycopy(ensembleMessage[i], 0 ,messageChiffre, i*ensembleMessage[i].length, ensembleMessage[i].length);
+            vi = ensembleMessage[i];
+        }
+        //Ecriture du fichier de chiffrement
+        try {
+            ecritureFichier("messageChiffre.txt", messageChiffre);
+            System.out.println(" -> Le fichier contenant le message chiffré est messageChiffre.txt\n");
+        } catch (IOException e) {
+            System.out.println(" |_!_| L'écriture du fichier messageChiffre.txt n'a pas fonctionné.\n");
+        }
+    }
+
+    public void dechiffrementModeECB(byte[][] messageDivise, byte[][] cleDivisee, int messageLength, int cleLength) throws IOException, NoSuchAlgorithmException {
+        BigInteger[][] ensembleMessage = new BigInteger[messageLength*8/tailleBlocs][tailleBlocs/8];
+        BigInteger[][] ensembleCle = new BigInteger[cleLength*8/tailleBlocs][tailleBlocs/8];
+        BigInteger[] messageDechiffre = new BigInteger[messageLength/8];
+        //Déchiffrement de chaque bloc
+        for (int i=0; i<messageLength*8/tailleBlocs; ++i){
+            ensembleMessage[i] = concatenation(messageDivise[i]);
+            ensembleCle[i] = concatenation(cleDivisee[i]);
+            ensembleMessage[i] = dechiffrement(ensembleMessage[i], ensembleCle[i]);
+            //Ajout des données de chaque bloc déchiffré à une variable
+            System.arraycopy(ensembleMessage[i], 0 ,messageDechiffre, i*ensembleMessage[i].length, ensembleMessage[i].length);
+        }
+        //Ecriture du fichier de déchiffrement
+        try {
+            ecritureFichier("messageDechiffre.txt", messageDechiffre);
+            System.out.println(" -> Le fichier contenant le message déchiffré est messageDechiffre.txt\n");
+        } catch (IOException e) {
+            System.out.println(" |_!_| L'écriture du fichier messageDechiffre.txt n'a pas fonctionné.\n");
+        }
+    }
+
+    public void dechiffrementModeCBC(byte[][] messageDivise, byte[][] cleDivisee, int messageLength, int cleLength) throws IOException, NoSuchAlgorithmException {
+        BigInteger[][] ensembleMessage = new BigInteger[messageLength*8/tailleBlocs][tailleBlocs/8];
+        BigInteger[][] ensembleCle = new BigInteger[cleLength*8/tailleBlocs][tailleBlocs/8];
+        BigInteger[] messageDechiffre = new BigInteger[messageLength/8];
+        BigInteger[] vi;
+        //Déchiffrement de chaque bloc
+        for (int i=messageLength*8/tailleBlocs-1; i>=0; --i){
+            ensembleMessage[i] = concatenation(messageDivise[i]);
+            ensembleCle[i] = concatenation(cleDivisee[i]);
+            ensembleMessage[i] = dechiffrement(ensembleMessage[i], ensembleCle[i]);
+            //XOR entre le message déchiffré et le message chiffré du bloc précédent
+            if (i != 0){
+                for (int j=0; j<ensembleMessage[i].length; ++j){
+                    vi = concatenation(messageDivise[i-1]);
+                    ensembleMessage[i][j] = ensembleMessage[i][j].xor(vi[j]);
+                }
+            }
+            else{
+                for (int l=0; l<ensembleMessage[i].length; ++l){
+                    ensembleMessage[i][l] = ensembleMessage[i][l].xor(ensembleCle[numVI][l]);
+                }
+            }
+            //Ajout des données de chaque bloc déchiffré à une variable
+            System.arraycopy(ensembleMessage[i], 0 ,messageDechiffre, i*ensembleMessage[i].length, ensembleMessage[i].length);
+        }
+        //Ecriture du fichier de déchiffrement
+        try {
+            ecritureFichier("messageDechiffre.txt", messageDechiffre);
+            System.out.println(" -> Le fichier contenant le message déchiffré est messageDechiffre.txt\n");
+        } catch (IOException e) {
+            System.out.println(" |_!_| L'écriture du fichier messageDechiffre.txt n'a pas fonctionné.\n");
         }
     }
 
