@@ -28,12 +28,16 @@ public class Main {
                 case 1:
                     System.out.println("Sur quel taille de bloc voulez-vous chiffrer ? (256, 512 ou 1024 bits)");
                     int tailleChiffrer=scanner.nextInt();
-                    t.ThreeFish(reponse, tailleChiffrer);
+                    System.out.println("Quel mode de chiffrement voulez-vous utiliser ? (1: ECB; 2: CBC)");
+                    int mode1=scanner.nextInt();
+                    t.ThreeFish(reponse, tailleChiffrer, mode1);
                     break;
                 case 2:
                     System.out.println("Sur quel taille de bloc voulez-vous déchiffrer ? (256, 512 ou 1024 bits)");
                     int tailleDechiffrer=scanner.nextInt();
-                    t.ThreeFish(reponse, tailleDechiffrer);
+                    System.out.println("Quel mode de chiffrement voulez-vous utiliser ? (1: ECB; 2:CBC)");
+                    int mode2=scanner.nextInt();
+                    t.ThreeFish(reponse, tailleDechiffrer, mode2);
                     break;
                 case 3:
                     System.out.println("Sur combien de bits voulez vous générer les clés ?");
